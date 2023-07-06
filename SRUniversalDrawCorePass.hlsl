@@ -16,6 +16,13 @@ struct Varyings
     float4 positionCS               : SV_POSITION;
 };
 
+float3 destruation(float3 color)
+{
+    float3 grayXfer = float3(0.3, 0.59, 0.11);
+    float grayf = dot(color, grayXfar);
+    return float3(grayf,grayf,grayf);
+}
+
 Varyings vert(Attributes input)
 {
     Varyings output = (Varyings)0;
@@ -92,6 +99,7 @@ float4 frag(Varyings input, bool isFrontFace : SV_IsFrontFace): SV_TARGET
     #endif
     indirectLightColor *= lerp(1,baseColor,_IndirectLightMixBaseColor);
     
+    float3 mainLightColor = mainLight.color;
     float mainLightShadow = 1;
     float rampRowIndex = 0;
     float rampRowNum = 1;
@@ -156,17 +164,17 @@ float4 frag(Varyings input, bool isFrontFace : SV_IsFrontFace): SV_TARGET
     #endif
     float isDay = lightDirectionWS.y * 0.5 + 0.5;
     float3 rampColor = lerp(coolRamp, warmRamp, isDay);
-
+    mainLightColor *= baseColor * rampColor;
     
     float3 albedo = 0;
     //albedo += baseColor;
-    //albedo += indirectLightColor;
+    albedo += indirectLightColor;
     //albedo = faceMap.rgb;
     //albedo = lightDirectionWS; // 主光源向量
     //albedo = normalWS; // 
     //albedo = viewDirections; // 相機向量
-    albedo += mainLightShadow;
-    albedo += rampColor;
+    //albedo += mainLightShadow;
+    albedo += mainLightColor;
     float alpha = _Alpha;
 
     float4 color = float4(albedo,alpha);
