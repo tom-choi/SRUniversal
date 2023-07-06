@@ -26,7 +26,7 @@ float3 _BackFaceTintColor;
 float _Alpha;
 float _AlphaClip;
 
-#if _AREA_FACE
+#if _AREA_HAIR
     sampler2D _HairLightMap;
 #elif _AREA_UPPERBODY
     sampler2D _UpperBodyLightMap;
@@ -34,10 +34,10 @@ float _AlphaClip;
     sampler2D _LowerBodyLightMap;
 #endif
 
-#if _AREA_FACE
-    sampler2D _HairCoolMap;
-    sampler2D _HairWarmMap;
-#elif _AREA_HAIR || _AREA_UPPERBODY || _AREA_LOWERBODY
+#if _AREA_HAIR
+    sampler2D _HairCoolRamp;
+    sampler2D _HairWarmRamp;
+#elif _AREA_FACE || _AREA_UPPERBODY || _AREA_LOWERBODY
     sampler2D _BodyCoolRamp;
     sampler2D _BodyWarmRamp;
 #endif

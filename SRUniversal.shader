@@ -25,8 +25,8 @@ Shader "Custom/SRUniversal"
         [Header(Ramp Map)]
         [NoScaleOffset] _HairCoolRamp("Hair cool ramp (Default white)",2D) = "white" {}
         [NoScaleOffset] _HairWarmRamp("Hair warm ramp (Default white)",2D) = "white" {}
-        [NoScaleOffset] _BodyCoolRamp("Hair cool ramp (Default white)",2D) = "white" {}
-        [NoScaleOffset] _BodyWarmRamp("Hair warm ramp (Default white)",2D) = "white" {}
+        [NoScaleOffset] _BodyCoolRamp("Body cool ramp (Default white)",2D) = "white" {}
+        [NoScaleOffset] _BodyWarmRamp("Body warm ramp (Default white)",2D) = "white" {}
 
         [Header(Indirect Lighting)]
         _IndirectLightFlattenNormal("Indirect light flatten normal (Default 0)",Range(0,1)) = 0
@@ -59,9 +59,9 @@ Shader "Custom/SRUniversal"
 
         [Header(Surface Options)]
         [Enum(UnityEngine.Rendering.CullMode)] _Cull ("Cull (Default back)", Float) = 2
-        [Enum(UnityEngine.Rendering.BlendMode)] _SrcBlendMode ("Cull (Default back)", Float) = 1
-        [Enum(UnityEngine.Rendering.BlendMode)] _DstBlendMode ("Cull (Default back)", Float) = 0
-        [Enum(UnityEngine.Rendering.BlendOp)] _BlendOp ("Cull (Default back)", Float) = 0
+        [Enum(UnityEngine.Rendering.BlendMode)] _SrcBlendMode ("Src blend mode (Default One)", Float) = 1
+        [Enum(UnityEngine.Rendering.BlendMode)] _DstBlendMode ("Dst blend mode (Default Zero)", Float) = 0
+        [Enum(UnityEngine.Rendering.BlendOp)] _BlendOp ("Blend operation (Default back)", Float) = 0
         [Enum(Off,0, On,1)] _ZWrite("ZWrite (Default On)",Float) = 1
         _StencilRef ("Stencil reference (Default 0)",Range(0,255)) = 0
         [Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil comparison (Default disabled)",Int) = 0
