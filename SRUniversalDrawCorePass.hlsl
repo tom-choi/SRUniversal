@@ -23,6 +23,11 @@ float3 destruation(float3 color)
     return float3(grayf,grayf,grayf);
 }
 
+// void Unity_SampleGradienV1_float(Gradient Gradien, float Time, out o, )
+// {
+
+// }
+
 Varyings vert(Attributes input)
 {
     Varyings output = (Varyings)0;
@@ -166,6 +171,7 @@ float4 frag(Varyings input, bool isFrontFace : SV_IsFrontFace): SV_TARGET
     float isDay = lightDirectionWS.y * 0.5 + 0.5;
     float3 rampColor = lerp(coolRamp, warmRamp, isDay);
     mainLightColor *= baseColor * rampColor;
+    // mainLightColor = rampColor;
 
     float3 specularColor = 0;
     #if _AREA_HAIR || _AREA_UPPERBODY || _AREA_LOWERBODY
@@ -189,7 +195,32 @@ float4 frag(Varyings input, bool isFrontFace : SV_IsFrontFace): SV_TARGET
         specularColor *= _SpecularBrightness;
     }
     #endif
-    
+
+    float3 stockingsEffect = 1;
+    #if _AREA_UPPERBODY || _AREA_LOWERBODY
+    {
+
+        float2 stockingMapRG = 0;
+        float stockingMapB = 0;
+        #if _AREA_UPPERBODY
+            stockingMapRG = tex2D(_UpperBodyStockings, input.uv).rg;
+            stockingMapB = tex2D(_UpperBodyStockings, input.uv * 20).b;
+        #elif _AREA_LOWERBODY
+            stockingMapRG = tex2D(_LowerBodyStockings, input.uv).rg;
+            stockingMapB = tex2D(_LowerBodyStockings, input.uv * 20).b;
+        #endif
+
+        float NoV = dot(normalWS, viewDirectionsWS);
+        float fac = NoV;
+        fac = pow(saturate(fac), _StockingsTransitionPower);
+        fac = saturate((fac - _StockingsTransitionHardness / 2)/ (1 - _StockingsTransitionHardness));
+        fac = fac * (stockingMapB * _StockingsTextureUsage + (1 - _StockingsTextureUsage)); // 細節紋理
+        //fac = lerp(fac, 1 , stockingMapRG.g)// 厚度插值亮區
+
+        stockingsEffect = fac;
+    }
+    #endif
+
     float3 albedo = 0;
     //albedo += baseColor;
     albedo += indirectLightColor;
@@ -200,6 +231,7 @@ float4 frag(Varyings input, bool isFrontFace : SV_IsFrontFace): SV_TARGET
     //albedo += mainLightShadow;
     albedo += mainLightColor;
     albedo += specularColor;
+    albedo = stockingsEffect;
     float alpha = _Alpha;
 
     float4 color = float4(albedo,alpha);

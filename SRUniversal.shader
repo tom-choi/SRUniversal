@@ -53,6 +53,18 @@ Shader "Custom/SRUniversal"
         _SpecularKsMetal("Specular KS metal (Default 1)",Range(0,1)) = 1
         _SpecularBrightness("Specular brightness (Default 1)",Range(0,10)) = 10
 
+        [Header(Stockings)]
+        [Toggle(_STOCKINGS_ON)] _UseStockings("Use Stockings (Default NO)",float) = 0
+        _UpperBodyStockings("Upper body stockings (Default black)",2D) = "black" {}
+        _LowerBodyStockings("Lower body stockings (Default black)",2D) = "black" {}
+        _StockingsDarkColor("Stockings dark color (Default black)",Color) = (0,0,0)
+        [HDR] _StockingsLightColor("Stockings light color (Default 1.8, 1.48299, 0.856821)",Color) = (1.8, 1.48299, 0.856821)
+        _StockingsTransitionColor("Stockings transition color (Default 0.360381, 0.242986, 0.358131)",Color) = (0.360381, 0.242986, 0.358131)
+        _StockingsTransitionThreshold("Stockings transition Threshold (Default 0.58)",Range(0,1)) = 0.58
+        _StockingsTransitionPower("Stockings transition power (Default 1)",Range(0,50)) = 1
+        _StockingsTransitionHardness("Stockings transition hardness (Default 0.4)",Range(0,1)) = 0.4
+        _StockingsTextureUsage("Stockings texture usage (Default 0.1)",Range(0,1)) = 0.1
+
         [Header(Emission)]
         [Toggle(_EMISSION_ON)] _UseEmission("Use emission (Default NO)",float) = 0
         _EmissionMixBaseColor("Emission mix base color (Default 1)", Range(0,1)) = 1
