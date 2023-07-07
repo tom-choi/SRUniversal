@@ -246,9 +246,15 @@ float4 frag(Varyings input, bool isFrontFace : SV_IsFrontFace): SV_TARGET
         fac = saturate((fac - _StockingsTransitionHardness / 2)/ (1 - _StockingsTransitionHardness));
         fac = fac * (stockingMapB * _StockingsTextureUsage + (1 - _StockingsTextureUsage)); // 細節紋理
         fac = lerp(fac, 1 , stockingMapRG.g);// 厚度插值亮區
-        //Gradient curve = GradientConstruct();
+        Gradient curve = GradientConstruct();
+        curve.colorLength = 3;
+        curve.colors[0] = float4(_StockingsDarkColor,0);
+        curve.colors[1] = float4(_StockingsTransitionColor,_StockingsTransitionThreshold);
+        curve.colors[2] = float4(_StockingsLightColor,1);
+        float3 stockingsColor = Unity_SampleGradienV1_float(curve, fac);
 
-        stockingsEffect = fac;
+        //stockingsEffect = fac;
+        stockingsEffect = lerp(1, stockingsColor, stockingMapRG.r);
     }
     #endif
 
@@ -262,7 +268,7 @@ float4 frag(Varyings input, bool isFrontFace : SV_IsFrontFace): SV_TARGET
     //albedo += mainLightShadow;
     albedo += mainLightColor;
     albedo += specularColor;
-    albedo = stockingsEffect;
+    albedo *= stockingsEffect;
     float alpha = _Alpha;
 
     float4 color = float4(albedo,alpha);
