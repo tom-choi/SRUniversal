@@ -45,6 +45,14 @@ Shader "Custom/SRUniversal"
         _FaceShadowOffset("Face shadow offset (Default -0.01)",Range(-1,1)) = -0.01
         _FaceShadowTransitionSoftness("Face shadow transition softness (Default 0.05)", Range(0,1)) = 0.05
 
+        [Header(Specular)]
+        [Toggle(_SPECULAR_ON)] _EnableSpecular ("Enable Specular (Default YES)", float) = 1
+        [Toggle(_METAL_SPECULAR_ON)] _EnableMetalSpecular ("Enable Metal Specular (Default YES)", float) = 1
+        _SpecularExpon("Specular exponent (Default 50)",Range(0,100)) = 50
+        _SpecularKsNonMrtal("Specular KS non-metal (Default 0.04)",Range(0,1)) = 0.04
+        _SpecularKsMetal("Specular KS metal (Default 1)",Range(0,1)) = 1
+        _SpecularBrightness("Specular brightness (Default 1)",Range(0,10)) = 10
+
         [Header(Emission)]
         [Toggle(_EMISSION_ON)] _UseEmission("Use emission (Default NO)",float) = 0
         _EmissionMixBaseColor("Emission mix base color (Default 1)", Range(0,1)) = 1

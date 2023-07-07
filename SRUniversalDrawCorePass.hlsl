@@ -18,7 +18,7 @@ struct Varyings
 
 float3 destruation(float3 color)
 {
-    float3 grayXfer = float3(0.3, 0.59, 0.11);
+    float3 grayXfar = float3(0.3, 0.59, 0.11);
     float grayf = dot(color, grayXfar);
     return float3(grayf,grayf,grayf);
 }
@@ -54,6 +54,7 @@ float4 frag(Varyings input, bool isFrontFace : SV_IsFrontFace): SV_TARGET
     float4 shadowCoord = TransformWorldToShadowCoord(positionWS);
     Light mainLight = GetMainLight(shadowCoord);
     float3 lightDirectionWS = normalize(mainLight.direction);
+    float3 viewDirectionsWS = normalize(input.viewDirectionsWS);
 
     float3 normalWS = normalize(input.normalWS);
 
@@ -99,7 +100,7 @@ float4 frag(Varyings input, bool isFrontFace : SV_IsFrontFace): SV_TARGET
     #endif
     indirectLightColor *= lerp(1,baseColor,_IndirectLightMixBaseColor);
     
-    float3 mainLightColor = mainLight.color;
+    float3 mainLightColor = lerp(destruation(mainLight.color), mainLight.color, _MainLightColorUsage);
     float mainLightShadow = 1;
     float rampRowIndex = 0;
     float rampRowNum = 1;
@@ -165,6 +166,29 @@ float4 frag(Varyings input, bool isFrontFace : SV_IsFrontFace): SV_TARGET
     float isDay = lightDirectionWS.y * 0.5 + 0.5;
     float3 rampColor = lerp(coolRamp, warmRamp, isDay);
     mainLightColor *= baseColor * rampColor;
+
+    float3 specularColor = 0;
+    #if _AREA_HAIR || _AREA_UPPERBODY || _AREA_LOWERBODY
+    {
+        float3 halfVectorWS = normalize(viewDirectionsWS + lightDirectionWS);
+        float NoH = dot(normalWS, halfVectorWS);
+        float blinnPhong = pow(saturate(NoH), _SpecularExpon);
+        
+        float nonMatalSpecular = step(1.04 - blinnPhong, lightMap.b) * _SpecularKsNonMetal;
+        float metalSpecular = blinnPhong * lightMap.b * _SpecularKsMetal;
+        
+        float metallic = 0;
+        #if _AREA_UPPERBODY || _AREA_LOWERBODY
+            metallic = saturate((abs(lightMap.a - 0.52) - 0.1) / (0 - 0.1));
+        #endif
+
+        // specularColor = metalSpecular;
+        // specularColor = metallic;
+        specularColor = lerp(nonMatalSpecular, metalSpecular * baseColor, metallic);
+        specularColor *= mainLight.color;
+        specularColor *= _SpecularBrightness;
+    }
+    #endif
     
     float3 albedo = 0;
     //albedo += baseColor;
@@ -175,6 +199,7 @@ float4 frag(Varyings input, bool isFrontFace : SV_IsFrontFace): SV_TARGET
     //albedo = viewDirections; // 相機向量
     //albedo += mainLightShadow;
     albedo += mainLightColor;
+    albedo += specularColor;
     float alpha = _Alpha;
 
     float4 color = float4(albedo,alpha);
