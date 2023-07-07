@@ -16,6 +16,27 @@ struct Varyings
     float4 positionCS               : SV_POSITION;
 };
 
+struct Gradient
+{
+    int colorLength;
+    float4 colors[8];
+};
+
+Gradient GradientConstruct()
+{
+    Gradient g;
+    g.colorLength = 2;
+    g.colors[0] = float4(1, 1, 1, 0);
+    g.colors[1] = float4(1, 1, 1, 1);
+    g.colors[2] = float4(0, 0, 0, 0);
+    g.colors[3] = float4(0, 0, 0, 0);
+    g.colors[4] = float4(0, 0, 0, 0);
+    g.colors[5] = float4(0, 0, 0, 0);
+    g.colors[6] = float4(0, 0, 0, 0);
+    g.colors[7] = float4(0, 0, 0, 0);
+    return g;
+}
+
 float3 destruation(float3 color)
 {
     float3 grayXfar = float3(0.3, 0.59, 0.11);
@@ -23,10 +44,19 @@ float3 destruation(float3 color)
     return float3(grayf,grayf,grayf);
 }
 
-// void Unity_SampleGradienV1_float(Gradient Gradien, float Time, out o, )
-// {
-
-// }
+float3 Unity_SampleGradienV1_float(Gradient Gradient, float Time)
+{
+    float3 color = Gradient.colors[0].rgb;
+    for (int c = 1; c < Gradient.colorLength; c++)
+    {
+        float colorPos = saturate((Time - Gradient.colors[c-1].w) / (Gradient.colors[c].w - Gradient.colors[c-1].w)) * step(c,Gradient.colorLength - 1);
+        color = lerp(color, Gradient.colors[c].rgb, colorPos);
+    }
+#ifdef UNITY_COLORSPACE_GAMMA
+    color = LinearToSRGB(color);
+#endif
+    return color;
+}
 
 Varyings vert(Attributes input)
 {
@@ -215,7 +245,8 @@ float4 frag(Varyings input, bool isFrontFace : SV_IsFrontFace): SV_TARGET
         fac = pow(saturate(fac), _StockingsTransitionPower);
         fac = saturate((fac - _StockingsTransitionHardness / 2)/ (1 - _StockingsTransitionHardness));
         fac = fac * (stockingMapB * _StockingsTextureUsage + (1 - _StockingsTextureUsage)); // 細節紋理
-        //fac = lerp(fac, 1 , stockingMapRG.g)// 厚度插值亮區
+        fac = lerp(fac, 1 , stockingMapRG.g);// 厚度插值亮區
+        //Gradient curve = GradientConstruct();
 
         stockingsEffect = fac;
     }
