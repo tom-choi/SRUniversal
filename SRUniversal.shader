@@ -238,6 +238,45 @@ Shader "Custom/SRUniversal"
             #include "SRUniversalDrawCorePass.hlsl"
             ENDHLSL
         }
+
+        Pass
+        {
+            Name "DrawOutline"
+            Tags {
+                "RenderPipeline" = "UniveralPipeline"
+                "RenderType" = "Opaque"
+                "LightMode" = "UniversalForwardOnly"
+            }
+            Cull Front
+            ZWrite [_ZWrite]
+
+            HLSLPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            
+            #pragma multi_compile_fog
+
+            #if _OUTLINE_ON
+            #include "SRUniversalInput.hlsl"
+            #include "SRUniversalDrawOutlinePass.hlsl"
+            #else
+            struct Attrubutes {};
+            struct Varyings
+            {
+                float4 positionCS : SV_POSITION;
+            };
+            Varyings vert(Attrubutes input)
+            {
+                return (Varyings)0;
+            }
+            float4 frag(Varyings input) : SV_TARGET
+            {
+                return 0;
+            }
+            #endif
+
+            ENDHLSL
+        }
     }
     FallBack "Diffuse"
 }
